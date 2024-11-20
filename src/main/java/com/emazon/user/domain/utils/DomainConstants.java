@@ -30,7 +30,8 @@ public final class DomainConstants {
     public static final String FIELD_EMAIL_NULL_MESSAGE = "Field 'Email' cannot be null.";
     public static final String FIELD_EMAIL_INVALID_MESSAGE = "Email must have a valid structure.";
 
-    public static final String FIELD_PASSWORD_NULL_MESSAGE = "Field 'Password' cannot be null.";
+    public static final String USERNAME_EMPTY_MESSAGE = "Field 'Username' cannot be empty.";
+    public static final String FIELD_PASSWORD_NULL_MESSAGE = "Field 'Password' cannot be null or empty.";
     public static final String FIELD_PASSWORD_ENCRYPTION_MESSAGE = "The password must be stored encrypted.";
 
     public static final String AUTHENTICATION_FAILED_MESSAGE = "Authentication failed. Incorrect user or password.";

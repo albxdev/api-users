@@ -4,13 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @Getter
 @Setter
 public class UpdateUserResponseDTO {
-    private Long id;
-    private String name;
+    private String firstName;
     private String lastName;
+    private String identityDocument;
     private String phone;
+    private LocalDate birthDate;
     private String email;
 }

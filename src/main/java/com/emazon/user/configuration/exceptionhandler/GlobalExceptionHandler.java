@@ -1,5 +1,6 @@
 package com.emazon.user.configuration.exceptionhandler;
 
+import com.emazon.user.adapters.driven.jpa.postgres.exception.RoleCannotBeNullException;
 import com.emazon.user.domain.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,16 +31,32 @@ public class GlobalExceptionHandler {
             fieldErrors.put(error.getField(), error.getDefaultMessage());
         }
 
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                "Validation failed",
-                request.getDescription(false).substring(4),
-                fieldErrors
-        );
+        ExceptionResponse response = ExceptionResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .statusCode(HttpStatus.BAD_REQUEST.value()) // Asegúrate de que se incluya este campo
+                .error("Validation failed")
+                .message("Validation failed")
+                .path(request.getDescription(false).substring(4))
+                .fieldErrors(fieldErrors)
+                .build();
 
         logger.error("Validation error: {}", fieldErrors);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FieldBirthdateInvalidException.class)
+    public ResponseEntity<ExceptionResponse> handleFieldBirthdateInvalidException(FieldBirthdateInvalidException ex, WebRequest request) {
+        ExceptionResponse response = ExceptionResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .statusCode(HttpStatus.BAD_REQUEST.value()) // Asegúrate de que se incluya este campo
+                .error("Bad Request") // Descripción del error
+                .message(ex.getMessage())
+                .path(request.getDescription(false).substring(4))
+                .build();
+
+        logger.error("Field birthdate invalid: {}", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -62,29 +79,45 @@ public class GlobalExceptionHandler {
             errorMessage = "Invalid user credentials provided.";
         }
 
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                status.value(),
-                status.getReasonPhrase(),
-                errorMessage,
-                request.getDescription(false).substring(4),
-                null
-        );
+        ExceptionResponse response = ExceptionResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .statusCode(status.value()) // Asegúrate de que se incluya este campo
+                .error("Error")
+                .message(errorMessage)
+                .path(request.getDescription(false).substring(4))
+                .build();
 
         logger.error("Custom exception caught: {}", errorMessage);
         return new ResponseEntity<>(response, status);
     }
 
+    @ExceptionHandler(RoleCannotBeNullException.class)
+    public ResponseEntity<ExceptionResponse> handleRoleCannotBeNull(RoleCannotBeNullException ex, WebRequest request) {
+        ExceptionResponse response = ExceptionResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .statusCode(HttpStatus.BAD_REQUEST.value()) // Asegúrate de que se incluya este campo
+                .error("Bad Request") // Descripción del error
+                .message(ex.getMessage())
+                .path(request.getDescription(false).substring(4))
+                .build();
+
+        logger.error("Role cannot be null: {}", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleGlobalException(Exception ex, WebRequest request) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                ex.getMessage(),
-                request.getDescription(false).substring(4),
-                null
-        );
+        ExceptionResponse response = ExceptionResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value()) // Asegúrate de que se incluya este campo
+                .error("Internal Server Error") // Descripción del error
+                .message(ex.getMessage())
+                .path(request.getDescription(false).substring(4))
+                .build();
+
         logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }

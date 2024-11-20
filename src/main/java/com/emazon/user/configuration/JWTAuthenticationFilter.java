@@ -23,17 +23,18 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final String jwtPrefix;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTTokenProvider tokenProvider,
-                                   String jwtHeader, String jwtPrefix) {
+                                   String jwtHeader, String jwtPrefix, String jwtUri) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.jwtHeader = jwtHeader;
         this.jwtPrefix = jwtPrefix;
-        setFilterProcessesUrl("/api/login");  // URL para login
+        setFilterProcessesUrl(jwtUri);
     }
+
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String usernameOrEmail = request.getParameter("username") != null ? request.getParameter("username") : request.getParameter("email");
+        String usernameOrEmail = request.getParameter("username") != null ? request.getParameter("username") : request.getParameter("admin");
         String password = request.getParameter("password");
 
         return authenticationManager.authenticate(
@@ -44,7 +45,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities();
-        String token = tokenProvider.generateToken(authResult.getName(), authorities); // Incluye roles en el token
+        String token = tokenProvider.generateToken(authResult.getName(), authorities);
         response.addHeader(jwtHeader, jwtPrefix + " " + token);
         chain.doFilter(request, response);
     }

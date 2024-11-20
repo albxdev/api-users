@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @Getter
 @Setter
@@ -31,7 +33,7 @@ public class CreateUserRequestDTO {
 
     @NotNull(message = DomainConstants.FIELD_BIRTHDATE_NULL_MESSAGE)
     @Past(message = DomainConstants.FIELD_BIRTHDATE_INVALID_MESSAGE)
-    private String birthDate;
+    private LocalDate birthDate;
 
     @NotNull(message = DomainConstants.FIELD_EMAIL_NULL_MESSAGE)
     @Email(message = DomainConstants.FIELD_EMAIL_INVALID_MESSAGE)
@@ -39,4 +41,6 @@ public class CreateUserRequestDTO {
 
     @NotNull(message = DomainConstants.FIELD_PASSWORD_NULL_MESSAGE)
     private String password;
+
+    private Long id_role;
 }

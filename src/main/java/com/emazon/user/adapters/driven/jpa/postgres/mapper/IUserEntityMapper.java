@@ -8,10 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface IUserEntityMapper {
 
-    // Mapeo automático sin necesidad de métodos personalizados
-    @Mapping(target = "role.name", source = "role")
     UserEntity toEntity(User user);
 
-    @Mapping(target = "role", source = "role.name")
     User toDomain(UserEntity userEntity);
 }

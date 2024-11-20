@@ -10,15 +10,15 @@ public class User {
     private String lastName;
     private String identityDocument;
     private String phone;
-    private LocalDate birthDate; // Cambiado a LocalDate
+    private LocalDate birthDate;
     private String email;
     private String password;
-    private String role;
+    private Long id_role;
 
     public User() {}
 
     public User(String firstName, String lastName, String identityDocument, String phone,
-                LocalDate birthDate, String email, String password) { // Cambiado a LocalDate
+                LocalDate birthDate, String email, String password, Long id_role) {
         setFirstName(firstName);
         setLastName(lastName);
         setIdentityDocument(identityDocument);
@@ -26,7 +26,7 @@ public class User {
         setBirthDate(birthDate);
         setEmail(email);
         setPassword(password);
-        this.role = "aux_bodega";
+        setId_role(id_role);
     }
 
     public void validate() {
@@ -37,7 +37,7 @@ public class User {
         validateBirthdate(this.birthDate);
         validateEmail(this.email);
         validatePassword(this.password);
-        validateRole(this.role);
+        validateIdRole(this.id_role);
     }
 
     // Métodos de validación
@@ -69,7 +69,6 @@ public class User {
         if (phone == null || phone.trim().isEmpty()) {
             throw new FieldPhoneNullException();
         }
-        // Asegurarse de que el teléfono sea válido según tus reglas
     }
 
     private void validateIdentityDocument(String identityDocument) {
@@ -94,7 +93,6 @@ public class User {
         if (email == null || email.trim().isEmpty()) {
             throw new FieldEmailInvalidException();
         }
-        // Aquí puedes incluir la validación del formato del email si es necesario
     }
 
     private void validatePassword(String password) {
@@ -103,8 +101,8 @@ public class User {
         }
     }
 
-    private void validateRole(String role) {
-        if (role == null) {
+    private void validateIdRole(Long id_role) {
+        if (id_role == null) {
             throw new FieldRoleNullException();
         }
     }
@@ -174,11 +172,11 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public Long getId_role() {
+        return id_role;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setId_role(Long id_role) {
+        this.id_role = id_role;
     }
 }

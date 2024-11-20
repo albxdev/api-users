@@ -1,29 +1,26 @@
-package com.emazon.user.adapters.driven.jpa.postgres.entity;
+    package com.emazon.user.adapters.driven.jpa.postgres.entity;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+    import jakarta.persistence.*;
+    import lombok.AllArgsConstructor;
+    import lombok.Getter;
+    import lombok.NoArgsConstructor;
+    import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@Table(name = "role")
-public class RoleEntity {
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Entity
+    @Table(name = "role")
+    public class RoleEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+        @Column(name = "name", nullable = false, unique = true)
+        private String name;
 
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "role_name", nullable = false)
-    private String roleName;
-}
+        @Column(name = "description")
+        private String description;
+    }

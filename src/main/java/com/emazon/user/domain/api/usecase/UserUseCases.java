@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class UserUseCases implements IUserServicePort {
@@ -25,25 +26,23 @@ public class UserUseCases implements IUserServicePort {
     @Override
     public void createUser(User user) {
         user.validate();
-
-        // Validaciones
         validateEmail(user.getEmail());
         validatePhone(user.getPhone());
         validateIdentityDocument(user.getIdentityDocument());
 
-        String password = user.getPassword();
-
-        // Verificar si el usuario ya existe por email
-        if (userPersistencePort.existsByEmail(user.getEmail())) {
+        Optional<User> existingUser = userPersistencePort.findByEmail(user.getEmail());
+        if (existingUser.isPresent()) {
             throw new UserAlreadyExistsException();
         }
 
         // Cifrar la contraseña antes de almacenarla
-        String encryptedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        String encryptedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
         user.setPassword(encryptedPassword);
 
-        // Asignar rol por defecto
-        user.setRole("aux_bodega");
+        // Validar el rol asignado
+        if (!isValidRole(user.getId_role())) {
+            throw new UserNotFoundException();
+        }
 
         // Comprobar si el usuario es mayor de edad
         if (!isAdult(user.getBirthDate())) {
@@ -58,7 +57,6 @@ public class UserUseCases implements IUserServicePort {
         if (id <= 0) {
             throw new IdCannotBeNegativeOrZeroException();
         }
-
         return userPersistencePort.getUserById(id)
                 .orElseThrow(UserNotFoundException::new);
     }
@@ -77,7 +75,6 @@ public class UserUseCases implements IUserServicePort {
         if (!"admin".equals(currentUserRole)) {
             throw new UserUnauthorizedAccessException();
         }
-
         if (!userPersistencePort.existsById(id)) {
             throw new UserNotFoundException();
         }
@@ -87,18 +84,15 @@ public class UserUseCases implements IUserServicePort {
     @Override
     public void updateUserById(Long id, User user) {
         String currentUserRole = getCurrentUserRole();
-
         if (!"admin".equals(currentUserRole) && !isCurrentUser(id)) {
             throw new UserUnauthorizedAccessException();
         }
-
         if (id <= 0) {
             throw new IdCannotBeNegativeOrZeroException();
         }
         if (!userPersistencePort.existsById(id)) {
             throw new UserNotFoundException();
         }
-
         user.validate();
         user.setId(id);
         userPersistencePort.updateUserById(id, user);
@@ -112,10 +106,10 @@ public class UserUseCases implements IUserServicePort {
                 return userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .findFirst()
-                        .orElse("ROLE_USER"); // Rol por defecto si no se encuentra
+                        .orElse("ROLE_USER");
             }
         }
-        return "ROLE_ANONYMOUS"; // Para usuarios no autenticados
+        return null;
     }
 
     private boolean isCurrentUser(Long userId) {
@@ -131,7 +125,6 @@ public class UserUseCases implements IUserServicePort {
     }
 
     private Long getUserIdFromUserDetails(UserDetails userDetails) {
-        // Implementar este método según tu implementación de UserDetails
         if (userDetails instanceof User user) {
             return user.getId();
         }
@@ -143,7 +136,6 @@ public class UserUseCases implements IUserServicePort {
     }
 
     private void validateEmail(String email) {
-        // Regex para validar el formato del correo electrónico
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         if (!Pattern.matches(emailRegex, email)) {
             throw new InvalidEmailFormatException();
@@ -151,16 +143,18 @@ public class UserUseCases implements IUserServicePort {
     }
 
     private void validatePhone(String phone) {
-        // Validar que el teléfono tenga un máximo de 13 caracteres y que contenga solo números y el símbolo +
         if (phone.length() > 13 || !phone.matches("[+\\d]+")) {
             throw new InvalidPhoneFormatException();
         }
     }
 
     private void validateIdentityDocument(String document) {
-        // Validar que el documento de identidad sea numérico
         if (!document.matches("\\d+")) {
             throw new InvalidIdentityDocumentException();
         }
+    }
+
+    private boolean isValidRole(Long idRole) {
+        return idRole != null && (idRole.equals(1L) || idRole.equals(2L));
     }
 }

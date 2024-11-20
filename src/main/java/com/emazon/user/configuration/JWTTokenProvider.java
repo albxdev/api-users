@@ -3,6 +3,9 @@ package com.emazon.user.configuration;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -13,9 +16,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Primary
 public class JWTTokenProvider {
 
     private final String SECRET_KEY = "Albertx1611!!";
+
+    @Bean
+    public JWTTokenProvider jwtTokenProvider() {
+        return new JWTTokenProvider();
+    }
+
 
     @Value("${security.jwt.expiration}")
     private long expirationTime;
